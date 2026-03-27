@@ -1,0 +1,115 @@
+---
+# Triggered when a version tag (e.g. v3.7.7) is pushed to main.
+# Steps:
+#   1. Build the PCM ZIP using build.py
+#   2. Compute SHA256, sizes, and download URL
+#   3. Create a GitHub Release and upload the ZIP as an asset
+#   4. Regenerate repository.json and commit it back to main
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to create releases and push commits
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+      - name: Build PCM archive
+        run: python build.py ${{ steps.version.outputs.VERSION }}
+
+      - name: Gather archive metadata
+        id: meta
+        run: |
+          ZIP=PCM/KiCAD-PCM-${{ steps.version.outputs.VERSION }}.zip
+          echo "ZIP=$ZIP" >> $GITHUB_OUTPUT
+          echo "SHA256=$(sha256sum $ZIP | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+          echo "DOWNLOAD_SIZE=$(stat -c%s $ZIP)" >> $GITHUB_OUTPUT
+          echo "INSTALL_SIZE=$(unzip -l $ZIP | tail -1 | awk '{print $1}')" >> $GITHUB_OUTPUT
+          REPO="${{ github.repository }}"
+          VER="${{ steps.version.outputs.VERSION }}"
+          echo "DOWNLOAD_URL=https://github.com/${REPO}/releases/download/v${VER}/KiCAD-PCM-${VER}.zip" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release and upload asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "v${{ steps.version.outputs.VERSION }}"
+          generate_release_notes: true
+          files: ${{ steps.meta.outputs.ZIP }}
+
+      - name: Update repository.json
+        run: |
+          python - <<'EOF'
+          import json, os
+
+          repo_file = "repository.json"
+          version   = os.environ["VERSION"]
+          sha256    = os.environ["SHA256"]
+          dl_size   = int(os.environ["DOWNLOAD_SIZE"])
+          inst_size = int(os.environ["INSTALL_SIZE"])
+          dl_url    = os.environ["DOWNLOAD_URL"]
+
+          # Load existing repository.json or create skeleton
+          try:
+              with open(repo_file) as f:
+                  repo = json.load(f)
+          except FileNotFoundError:
+              repo = {"packages": []}
+
+          # Find or create this package entry
+          pkg_id = "com.github.harry10086.kicad-jlcpcb-tools-szlcsc"
+          pkg = next((p for p in repo["packages"] if p.get("identifier") == pkg_id), None)
+          if pkg is None:
+              pkg = {"identifier": pkg_id, "versions": []}
+              repo["packages"].append(pkg)
+
+          # Prepend new version entry
+          new_ver = {
+              "version":       version,
+              "status":        "beta",
+              "kicad_version": "6.0",
+              "download_sha256": sha256,
+              "download_size": dl_size,
+              "download_url":  dl_url,
+              "install_size":  inst_size
+          }
+          pkg["versions"] = [new_ver] + [v for v in pkg.get("versions", []) if v["version"] != version]
+
+          with open(repo_file, "w") as f:
+              json.dump(repo, f, indent=4, ensure_ascii=False)
+          print(f"repository.json updated with version {version}")
+          EOF
+        env:
+          VERSION:       ${{ steps.version.outputs.VERSION }}
+          SHA256:        ${{ steps.meta.outputs.SHA256 }}
+          DOWNLOAD_SIZE: ${{ steps.meta.outputs.DOWNLOAD_SIZE }}
+          INSTALL_SIZE:  ${{ steps.meta.outputs.INSTALL_SIZE }}
+          DOWNLOAD_URL:  ${{ steps.meta.outputs.DOWNLOAD_URL }}
+
+      - name: Commit repository.json back to main
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add repository.json
+          git diff --cached --quiet || git commit -m "chore: update repository.json for v${{ steps.version.outputs.VERSION }}"
+          git push origin HEAD:main

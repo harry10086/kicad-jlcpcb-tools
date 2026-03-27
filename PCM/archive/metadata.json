@@ -1,0 +1,29 @@
+{
+    "$schema": "https://go.kicad.org/pcm/schemas/v1",
+    "name": "KiCAD JLCPCB Tools (SZLCSC Edition)",
+    "description": "A JLCPCB integration addon for KiCAD optimized for the SZLCSC API.",
+    "description_full": "Based on Bouni's original plugin, this fork is optimized for Chinese users by relying exclusively on the live SZLCSC (szlcsc.com) API, removing the need for offline database downloads. It features an improved real-time search interface, dynamic package selections, stock threshold filtering, and native RMB pricing.",
+    "identifier": "com.github.harry10086.kicad-jlcpcb-tools-szlcsc",
+    "type": "plugin",
+    "author": {
+        "name": "harry10086 (Forked from Bouni)",
+        "contact": {
+            "web": "https://github.com/harry10086"
+        }
+    },
+    "maintainer": {
+        "name": "harry10086",
+        "contact": {
+            "web": "https://github.com/harry10086"
+        }
+    },
+    "license": "MIT",
+    "resources": {
+        "homepage": "https://github.com/harry10086/kicad-jlcpcb-tools"
+    },
+    "versions": [{
+        "version": "3.7.7",
+        "status": "testing",
+        "kicad_version": "6.0"
+    }]
+}
