@@ -69,31 +69,24 @@ jobs:
           inst_size = int(os.environ["INSTALL_SIZE"])
           dl_url    = os.environ["DOWNLOAD_URL"]
 
-          # Load existing repository.json or create skeleton
-          try:
-              with open(repo_file) as f:
-                  repo = json.load(f)
-          except FileNotFoundError:
-              repo = {"packages": []}
+          with open(repo_file) as f:
+              repo = json.load(f)
 
-          # Find or create this package entry
-          pkg_id = "com.github.harry10086.kicad-jlcpcb-tools-szlcsc"
-          pkg = next((p for p in repo["packages"] if p.get("identifier") == pkg_id), None)
-          if pkg is None:
-              pkg = {"identifier": pkg_id, "versions": []}
-              repo["packages"].append(pkg)
+          pkg = repo["packages"][0]
 
-          # Prepend new version entry
           new_ver = {
-              "version":       version,
-              "status":        "beta",
-              "kicad_version": "6.0",
+              "version":         version,
+              "status":          "testing",
+              "kicad_version":   "6.0",
               "download_sha256": sha256,
-              "download_size": dl_size,
-              "download_url":  dl_url,
-              "install_size":  inst_size
+              "download_size":   dl_size,
+              "download_url":    dl_url,
+              "install_size":    inst_size
           }
-          pkg["versions"] = [new_ver] + [v for v in pkg.get("versions", []) if v["version"] != version]
+          # keep only other versions (no duplicates), prepend newest
+          pkg["versions"] = [new_ver] + [
+              v for v in pkg.get("versions", []) if v["version"] != version
+          ]
 
           with open(repo_file, "w") as f:
               json.dump(repo, f, indent=4, ensure_ascii=False)
