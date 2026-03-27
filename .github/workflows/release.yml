@@ -71,7 +71,7 @@ jobs:
           with open("packages.json") as f:
               pkgs = json.load(f)
 
-          pkg = pkgs[0]
+          pkg = pkgs["packages"][0]
           new_ver = {
               "version":         version,
               "status":          "testing",
