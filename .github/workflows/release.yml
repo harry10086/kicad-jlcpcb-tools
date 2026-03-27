@@ -57,30 +57,21 @@ jobs:
           generate_release_notes: true
           files: ${{ steps.meta.outputs.ZIP }}
 
-      - name: Update repository.json
+      - name: Update packages.json and repository.json
         run: |
-          python - <<'EOF'
-          import json, os
+          import json, os, hashlib, datetime
 
-          repo_file = "repository.json"
           version   = os.environ["VERSION"]
           sha256    = os.environ["SHA256"]
           dl_size   = int(os.environ["DOWNLOAD_SIZE"])
           inst_size = int(os.environ["INSTALL_SIZE"])
           dl_url    = os.environ["DOWNLOAD_URL"]
 
-          with open(repo_file) as f:
-              repo = json.load(f)
+          # --- Update packages.json ---
+          with open("packages.json") as f:
+              pkgs = json.load(f)
 
-          # Ensure required repository root metadata exists
-          repo["name"] = "harry10086's KiCad repository"
-          repo["maintainer"] = {
-              "name": "harry10086",
-              "contact": { "web": "https://github.com/harry10086" }
-          }
-
-          pkg = repo["packages"][0]
-
+          pkg = pkgs[0]
           new_ver = {
               "version":         version,
               "status":          "testing",
@@ -90,15 +81,33 @@ jobs:
               "download_url":    dl_url,
               "install_size":    inst_size
           }
-          # keep only other versions (no duplicates), prepend newest
           pkg["versions"] = [new_ver] + [
               v for v in pkg.get("versions", []) if v["version"] != version
           ]
 
-          with open(repo_file, "w") as f:
+          packages_str = json.dumps(pkgs, indent=4, ensure_ascii=False)
+          with open("packages.json", "w") as f:
+              f.write(packages_str)
+
+          # --- Compute sha256 of packages.json ---
+          pkg_sha256 = hashlib.sha256(packages_str.encode()).hexdigest()
+          now = datetime.datetime.utcnow()
+          timestamp = int(now.timestamp())
+          time_str  = now.strftime("%Y-%m-%d %H:%M:%S")
+
+          # --- Update repository.json pointer ---
+          with open("repository.json") as f:
+              repo = json.load(f)
+
+          repo["packages"]["sha256"]           = pkg_sha256
+          repo["packages"]["update_timestamp"] = timestamp
+          repo["packages"]["update_time_utc"]  = time_str
+
+          with open("repository.json", "w") as f:
               json.dump(repo, f, indent=4, ensure_ascii=False)
-          print(f"repository.json updated with version {version}")
-          EOF
+
+          print(f"packages.json and repository.json updated for version {version}")
+        shell: python
         env:
           VERSION:       ${{ steps.version.outputs.VERSION }}
           SHA256:        ${{ steps.meta.outputs.SHA256 }}
@@ -106,10 +115,10 @@ jobs:
           INSTALL_SIZE:  ${{ steps.meta.outputs.INSTALL_SIZE }}
           DOWNLOAD_URL:  ${{ steps.meta.outputs.DOWNLOAD_URL }}
 
-      - name: Commit repository.json back to main
+      - name: Commit PCM files back to main
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add repository.json
-          git diff --cached --quiet || git commit -m "chore: update repository.json for v${{ steps.version.outputs.VERSION }}"
+          git add packages.json repository.json
+          git diff --cached --quiet || git commit -m "chore: update PCM files for v${{ steps.version.outputs.VERSION }}"
           git push origin HEAD:main

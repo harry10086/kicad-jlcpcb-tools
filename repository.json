@@ -6,42 +6,10 @@
             "web": "https://github.com/harry10086/kicad-jlcpcb-tools"
         }
     },
-
-    "packages": [
-        {
-            "$schema": "https://go.kicad.org/pcm/schemas/v1",
-            "name": "KiCAD JLCPCB Tools (SZLCSC Edition)",
-            "description": "A JLCPCB integration addon for KiCAD optimized for the SZLCSC API.",
-            "description_full": "Based on Bouni's original plugin, this fork is optimized for Chinese users by relying exclusively on the live SZLCSC (szlcsc.com) API, removing the need for offline database downloads. It features an improved real-time search interface, dynamic package selections, stock threshold filtering, and native RMB pricing.",
-            "identifier": "com.github.harry10086.kicad-jlcpcb-tools-szlcsc",
-            "type": "plugin",
-            "author": {
-                "name": "Bouni(original), harry10086(fork)",
-                "contact": {
-                    "web": "https://github.com/Bouni/kicad-jlcpcb-tools"
-                }
-            },
-            "maintainer": {
-                "name": "harry10086",
-                "contact": {
-                    "web": "https://github.com/harry10086/kicad-jlcpcb-tools"
-                }
-            },
-            "license": "MIT",
-            "resources": {
-                "homepage": "https://github.com/harry10086/kicad-jlcpcb-tools"
-            },
-            "versions": [
-                {
-                    "version": "3.7.7",
-                    "status": "testing",
-                    "kicad_version": "6.0",
-                    "download_sha256": "79942f8897bcceea479ec8122da37aaf7de64b6d901b5bc2bca0901fbc6eafd7",
-                    "download_size": 205591,
-                    "download_url": "https://github.com/harry10086/kicad-jlcpcb-tools/releases/download/v3.7.7/KiCAD-PCM-3.7.7.zip",
-                    "install_size": 615141
-                }
-            ]
-        }
-    ]
+    "packages": {
+        "url": "https://raw.githubusercontent.com/harry10086/kicad-jlcpcb-tools/main/packages.json",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "update_timestamp": 0,
+        "update_time_utc": "2025-01-01 00:00:00"
+    }
 }
