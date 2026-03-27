@@ -72,6 +72,13 @@ jobs:
           with open(repo_file) as f:
               repo = json.load(f)
 
+          # Ensure required repository root metadata exists
+          repo["name"] = "harry10086's KiCad repository"
+          repo["maintainer"] = {
+              "name": "harry10086",
+              "contact": { "web": "https://github.com/harry10086" }
+          }
+
           pkg = repo["packages"][0]
 
           new_ver = {

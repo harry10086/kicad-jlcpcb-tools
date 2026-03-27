@@ -1,4 +1,12 @@
 {
+    "name": "harry10086's KiCad Repository (SZLCSC)",
+    "maintainer": {
+        "name": "harry10086",
+        "contact": {
+            "web": "https://github.com/harry10086/kicad-jlcpcb-tools"
+        }
+    },
+
     "packages": [
         {
             "$schema": "https://go.kicad.org/pcm/schemas/v1",
