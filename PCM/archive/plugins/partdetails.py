@@ -20,7 +20,7 @@ class PartDetailsDialog(wx.Dialog):
             self,
             parent,
             id=wx.ID_ANY,
-            title="JLCPCB Part Details",
+            title="JLCPCB 元件详情",
             pos=wx.DefaultPosition,
             size=HighResWxSize(parent.window, wx.Size(1000, 800)),
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.STAY_ON_TOP,
@@ -86,7 +86,7 @@ class PartDetailsDialog(wx.Dialog):
         self.openpdf_button = wx.Button(
             self,
             wx.ID_ANY,
-            "Open Datasheet",
+            "打开数据手册",
             wx.DefaultPosition,
             wx.DefaultSize,
             0,
@@ -95,7 +95,7 @@ class PartDetailsDialog(wx.Dialog):
         self.openpage_button = wx.Button(
             self,
             wx.ID_ANY,
-            "Open LCSC page",
+            "打开立创商城页面",
             wx.DefaultPosition,
             wx.DefaultSize,
             0,

@@ -21,7 +21,7 @@ class PartSelectorDialog(wx.Dialog):
             self,
             parent,
             id=wx.ID_ANY,
-            title="JLCPCB Library",
+            title="JLCPCB 元件库",
             pos=wx.DefaultPosition,
             size=HighResWxSize(parent.window, wx.Size(1400, 800)),
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.MAXIMIZE_BOX,
@@ -226,13 +226,13 @@ class PartSelectorDialog(wx.Dialog):
         # ---------------------------------------------------------------------
 
         self.result_count = wx.StaticText(
-            self, wx.ID_ANY, "0 Results", wx.DefaultPosition, wx.DefaultSize
+            self, wx.ID_ANY, "0 条结果", wx.DefaultPosition, wx.DefaultSize
         )
         
         self.load_more_button = wx.Button(
             self,
             wx.ID_ANY,
-            "Load More (30)",
+            "加载更多 (30)",
             wx.DefaultPosition,
             wx.DefaultSize,
             0,
@@ -355,7 +355,7 @@ class PartSelectorDialog(wx.Dialog):
         self.select_part_button = wx.Button(
             self,
             wx.ID_ANY,
-            "Select part",
+            "选择元件",
             wx.DefaultPosition,
             HighResWxSize(parent.window, wx.Size(150, -1)),
             0,
@@ -363,7 +363,7 @@ class PartSelectorDialog(wx.Dialog):
         self.part_details_button = wx.Button(
             self,
             wx.ID_ANY,
-            "Show part details",
+            "查看元件详情",
             wx.DefaultPosition,
             HighResWxSize(parent.window, wx.Size(150, -1)),
             0,
@@ -494,7 +494,7 @@ class PartSelectorDialog(wx.Dialog):
             "package": self.package.GetValue(),
         }
         
-        self.result_count.SetLabel("Loading...")
+        self.result_count.SetLabel("加载中...")
         self.Update()
 
         start = time.time()
@@ -624,10 +624,10 @@ class PartSelectorDialog(wx.Dialog):
         count = len(parts)
         if count >= 1000:
             self.result_count.SetLabel(
-                f"{count} Results (limited) in {search_duration_text}"
+                f"{count} 条结果 (已限制) 用时 {search_duration_text}"
             )
         else:
-            self.result_count.SetLabel(f"{count} Results in {search_duration_text}")
+            self.result_count.SetLabel(f"{count} 条结果 用时 {search_duration_text}")
         for p in parts:
             item = [str(c) for c in p]
             pricecol = 8  # Must match order in library.py search function
@@ -635,10 +635,10 @@ class PartSelectorDialog(wx.Dialog):
             if price > 0:
                 sum = round(price * len(self.parts), 3)
                 item[pricecol] = (
-                    f"{len(self.parts)} parts: ¥{price} each / ¥{sum} total"
+                    f"{len(self.parts)} 个元件: 单价 ¥{price} / 合计 ¥{sum}"
                 )
             else:
-                item[pricecol] = "Error in price data"
+                item[pricecol] = "价格数据错误"
             params = item[7]
             item.insert(5, params)
             self.part_list_model.AddEntry(item)

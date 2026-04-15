@@ -18,7 +18,7 @@ class PartMapperManagerDialog(wx.Dialog):
             self,
             parent,
             id=wx.ID_ANY,
-            title="Footprint Mapper",
+            title="封装映射管理器",
             pos=wx.DefaultPosition,
             size=HighResWxSize(parent.window, wx.Size(800, 800)),
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.MAXIMIZE_BOX,
@@ -90,7 +90,7 @@ class PartMapperManagerDialog(wx.Dialog):
         self.delete_button = wx.Button(
             self,
             wx.ID_ANY,
-            "Delete",
+            "删除",
             wx.DefaultPosition,
             HighResWxSize(parent.window, wx.Size(150, -1)),
             0,
@@ -98,7 +98,7 @@ class PartMapperManagerDialog(wx.Dialog):
         self.import_button = wx.Button(
             self,
             wx.ID_ANY,
-            "Import",
+            "导入",
             wx.DefaultPosition,
             HighResWxSize(parent.window, wx.Size(150, -1)),
             0,
@@ -106,7 +106,7 @@ class PartMapperManagerDialog(wx.Dialog):
         self.export_button = wx.Button(
             self,
             wx.ID_ANY,
-            "Export",
+            "导出",
             wx.DefaultPosition,
             HighResWxSize(parent.window, wx.Size(150, -1)),
             0,
@@ -204,7 +204,7 @@ class PartMapperManagerDialog(wx.Dialog):
         """Dialog to import mappings from a CSV file."""
         with wx.FileDialog(
             self,
-            "Import Mapping CSV",
+            "导入映射 CSV",
             "",
             "",
             "CSV files (*.csv)|*.csv",
@@ -219,7 +219,7 @@ class PartMapperManagerDialog(wx.Dialog):
         """Dialog to export mappings to a CSV file."""
         with wx.FileDialog(
             self,
-            "Export Mapping CSV",
+            "导出映射 CSV",
             "",
             "mapping",
             "CSV files (*.csv)|*.csv",

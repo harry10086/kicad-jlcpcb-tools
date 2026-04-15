@@ -99,14 +99,14 @@ class JLCPCBTools(wx.Dialog):
             self,
             parent,
             id=wx.ID_ANY,
-            title=f"JLCPCB Tools [ {getVersion()} ]",
+            title=f"JLCPCB 工具 [ {getVersion()} ]",
             pos=wx.DefaultPosition,
-            size=wx.Size(1300, 800),
+            size=wx.Size(1500, 900),
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.MAXIMIZE_BOX,
         )
         self.pcbnew = kicad_provider.get_pcbnew()
         self.window = wx.GetTopLevelParent(self)
-        self.SetSize(HighResWxSize(self.window, wx.Size(1300, 800)))
+        self.SetSize(HighResWxSize(self.window, wx.Size(1500, 900)))
         self.scale_factor = GetScaleFactor(self.window)
         self.project_path = os.path.split(self.pcbnew.GetBoard().GetFileName())[0]
         self.board_name = os.path.split(self.pcbnew.GetBoard().GetFileName())[1]
@@ -140,15 +140,15 @@ class JLCPCBTools(wx.Dialog):
             self,
             wx.ID_ANY,
             wx.DefaultPosition,
-            wx.Size(1300, -1),
+            wx.Size(1500, -1),
             wx.TB_HORIZONTAL | wx.TB_TEXT | wx.TB_NODIVIDER,
         )
 
         self.generate_button = self.upper_toolbar.AddTool(
             ID_GENERATE,
-            "Generate",
+            "生成",
             loadBitmapScaled("fabrication.png", self.scale_factor),
-            "Generate fabrication files for JLCPCB",
+            "生成 JLCPCB 生产文件",
         )
 
         self.upper_toolbar.AddSeparator()
@@ -158,18 +158,18 @@ class JLCPCBTools(wx.Dialog):
         )
 
         layer_options = [
-            "Auto",
-            "1 Layer",
-            "2 Layer",
-            "4 Layer",
-            "6 Layer",
-            "8 Layer",
-            "10 Layer",
-            "12 Layer",
-            "14 Layer",
-            "16 Layer",
-            "18 Layer",
-            "20 Layer",
+            "自动",
+            "1 层",
+            "2 层",
+            "4 层",
+            "6 层",
+            "8 层",
+            "10 层",
+            "12 层",
+            "14 层",
+            "16 层",
+            "18 层",
+            "20 层",
         ]
 
         for option in layer_options:
@@ -186,32 +186,40 @@ class JLCPCBTools(wx.Dialog):
 
         self.upper_toolbar.AddStretchableSpace()
 
+        self.download_button = self.upper_toolbar.AddTool(
+            ID_DOWNLOAD,
+            "下载数据库",
+            loadBitmapScaled("mdi-cloud-download-outline.png", self.scale_factor),
+            "下载离线元件数据库",
+        )
+
         self.correction_button = self.upper_toolbar.AddTool(
             ID_CORRECTIONS,
-            "Corrections",
+            "修正",
             loadBitmapScaled("mdi-format-rotate-90.png", self.scale_factor),
-            "Manage part corrections",
+            "管理元件修正",
         )
 
         self.mapping_button = self.upper_toolbar.AddTool(
             ID_MAPPINGS,
-            "Mappings",
+            "映射",
             loadBitmapScaled("mdi-selection.png", self.scale_factor),
-            "Manage part mappings",
+            "管理元件映射",
         )
 
         self.upper_toolbar.AddSeparator()
 
         self.settings_button = self.upper_toolbar.AddTool(
             ID_SETTINGS,
-            "Settings",
+            "设置",
             loadBitmapScaled("mdi-cog-outline.png", self.scale_factor),
-            "Manage settings",
+            "管理设置",
         )
 
         self.upper_toolbar.Realize()
 
         self.Bind(wx.EVT_TOOL, self.generate_fabrication_data, self.generate_button)
+        self.Bind(wx.EVT_TOOL, self.update_library, self.download_button)
         self.Bind(wx.EVT_TOOL, self.manage_corrections, self.correction_button)
         self.Bind(wx.EVT_TOOL, self.manage_mappings, self.mapping_button)
         self.Bind(wx.EVT_TOOL, self.manage_settings, self.settings_button)
@@ -224,120 +232,120 @@ class JLCPCBTools(wx.Dialog):
             self,
             wx.ID_ANY,
             wx.DefaultPosition,
-            wx.Size(int(self.scale_factor * 128), -1),
+            wx.Size(int(self.scale_factor * 160), -1),
             wx.TB_VERTICAL | wx.TB_TEXT | wx.TB_NODIVIDER,
         )
 
         self.select_part_button = self.right_toolbar.AddTool(
             ID_SELECT_PART,
-            "Assign LCSC number",
+            "分配 LCSC 编号",
             loadBitmapScaled(
                 "mdi-database-search-outline.png",
                 self.scale_factor,
             ),
-            "Assign a LCSC number to a footprint",
+            "为封装分配 LCSC 编号",
         )
 
         self.remove_lcsc_number_button = self.right_toolbar.AddTool(
             ID_REMOVE_LCSC_NUMBER,
-            "Remove LCSC number",
+            "移除 LCSC 编号",
             loadBitmapScaled(
                 "mdi-close-box-outline.png",
                 self.scale_factor,
             ),
-            "Remove a LCSC number from a footprint",
+            "从封装移除 LCSC 编号",
         )
 
         self.select_alike_button = self.right_toolbar.AddTool(
             ID_SELECT_ALIKE,
-            "Select alike parts",
+            "选择相同元件",
             loadBitmapScaled(
                 "mdi-checkbox-multiple-marked.png",
                 self.scale_factor,
             ),
-            "Select footprint that are alike",
+            "选择相同的封装",
         )
 
         self.toggle_bom_pos_button = self.right_toolbar.AddTool(
             ID_TOGGLE_BOM_POS,
-            "Toggle BOM & POS",
+            "切换 BOM 和 POS",
             loadBitmapScaled(
                 "bom-pos.png",
                 self.scale_factor,
             ),
-            "Toggle exclud from BOM and POS attribute",
+            "切换排除 BOM 和 POS 属性",
         )
 
         self.toggle_bom_button = self.right_toolbar.AddTool(
             ID_TOGGLE_BOM,
-            "Toggle BOM",
+            "切换 BOM",
             loadBitmapScaled(
                 "mdi-format-list-bulleted.png",
                 self.scale_factor,
             ),
-            "Toggle exclude from BOM attribute",
+            "切换排除 BOM 属性",
         )
 
         self.toggle_pos_button = self.right_toolbar.AddTool(
             ID_TOGGLE_POS,
-            "Toggle POS",
+            "切换 POS",
             loadBitmapScaled(
                 "mdi-crosshairs-gps.png",
                 self.scale_factor,
             ),
-            "Toggle exclude from POS attribute",
+            "切换排除 POS 属性",
         )
 
         self.part_details_button = self.right_toolbar.AddTool(
             ID_PART_DETAILS,
-            "Part details",
+            "元件详情",
             loadBitmapScaled(
                 "mdi-text-box-search-outline.png",
                 self.scale_factor,
             ),
-            "Show details of an assigned LCSC part",
+            "显示已分配 LCSC 元件的详情",
         )
 
         self.hide_bom_button = self.right_toolbar.AddCheckTool(
             ID_HIDE_BOM,
-            "Hide excluded BOM",
+            "隐藏已排除的 BOM",
             loadBitmapScaled(
                 "mdi-eye-off-outline.png",
                 self.scale_factor,
             ),
             wx.NullBitmap,
-            "Hide excluded BOM parts",
+            "隐藏已排除的 BOM 元件",
         )
 
         self.hide_pos_button = self.right_toolbar.AddCheckTool(
             ID_HIDE_POS,
-            "Hide excluded POS",
+            "隐藏已排除的 POS",
             loadBitmapScaled(
                 "mdi-eye-off-outline.png",
                 self.scale_factor,
             ),
             wx.NullBitmap,
-            "Hide excluded POS parts",
+            "隐藏已排除的 POS 元件",
         )
 
         self.save_all_button = self.right_toolbar.AddTool(
             ID_SAVE_MAPPINGS,
-            "Save mappings",
+            "保存映射",
             loadBitmapScaled(
                 "mdi-content-save-settings.png",
                 self.scale_factor,
             ),
-            "Save all mappings",
+            "保存全部映射",
         )
 
         self.export_schematic_button = self.right_toolbar.AddTool(
             ID_EXPORT_TO_SCHEMATIC,
-            "Export to schematic",
+            "导出到原理图",
             loadBitmapScaled(
                 "mdi-application-export.png",
                 self.scale_factor,
             ),
-            "Export mappings to schematic",
+            "将映射导出到原理图",
         )
 
         self.Bind(wx.EVT_TOOL, self.select_part, self.select_part_button)
@@ -473,7 +481,7 @@ class JLCPCBTools(wx.Dialog):
         # ---------------------- Main Layout Sizer ----------------------------
         # ---------------------------------------------------------------------
 
-        self.SetSizeHints(HighResWxSize(self.window, wx.Size(1000, -1)), wx.DefaultSize)
+        self.SetSizeHints(HighResWxSize(self.window, wx.Size(1200, -1)), wx.DefaultSize)
         layout = wx.BoxSizer(wx.VERTICAL)
         layout.Add(self.upper_toolbar, 0, wx.ALL | wx.EXPAND, 5)
         layout.Add(table_sizer, 20, wx.ALL | wx.EXPAND, 5)
@@ -534,7 +542,7 @@ class JLCPCBTools(wx.Dialog):
         if meta is not None:
             last_update = dt.fromisoformat(meta.last_update).strftime("%Y-%m-%d %H:%M")
             self.SetTitle(
-                f"JLCPCB Tools [ {getVersion()} ] | Last database update: {last_update}",
+                f"JLCPCB 工具 [ {getVersion()} ] | 离线数据库上次更新: {last_update}",
             )
             self.logger.debug(
                 "JLCPCB version %s, last database update %s, part count %d, size (bytes) %d",
@@ -545,7 +553,7 @@ class JLCPCBTools(wx.Dialog):
             )
         else:
             self.SetTitle(
-                f"JLCPCB Tools [ {getVersion()} ] | Last database update: No DB found",
+                f"JLCPCB 工具 [ {getVersion()} ] | 离线数据库上次更新: 未找到数据库",
             )
             self.logger.debug("JLCPCB version %s, no parts db info found", getVersion())
 
@@ -672,7 +680,7 @@ class JLCPCBTools(wx.Dialog):
                     self.scale_factor,
                 )
             )
-            self.hide_bom_button.SetLabel("Show excluded BOM")
+            self.hide_bom_button.SetLabel("显示已排除的 BOM")
         else:
             self.hide_bom_button.SetNormalBitmap(
                 loadBitmapScaled(
@@ -686,7 +694,7 @@ class JLCPCBTools(wx.Dialog):
                     self.scale_factor,
                 )
             )
-            self.hide_bom_button.SetLabel("Hide excluded BOM")
+            self.hide_bom_button.SetLabel("隐藏已排除的 BOM")
         self.populate_footprint_list()
 
     def OnPosHide(self, *_):
@@ -705,7 +713,7 @@ class JLCPCBTools(wx.Dialog):
                     self.scale_factor,
                 )
             )
-            self.hide_pos_button.SetLabel("Show excluded POS")
+            self.hide_pos_button.SetLabel("显示已排除的 POS")
         else:
             self.hide_pos_button.SetNormalBitmap(
                 loadBitmapScaled(
@@ -719,7 +727,7 @@ class JLCPCBTools(wx.Dialog):
                     self.scale_factor,
                 )
             )
-            self.hide_pos_button.SetLabel("Hide excluded POS")
+            self.hide_pos_button.SetLabel("隐藏已排除的 POS")
         self.populate_footprint_list()
 
     def OnFootprintSelected(self, *_):
@@ -802,7 +810,7 @@ class JLCPCBTools(wx.Dialog):
     def select_alike(self, *_):
         """Select all parts that have the same value and footprint."""
         if self.footprint_list.GetSelectedItemsCount() > 1:
-            self.logger.warning("Select only one component, please.")
+            self.logger.warning("请只选择一个元件。")
             return
         item = self.footprint_list.GetSelection()
         for item in self.partlist_data_model.select_alike(item):
@@ -947,10 +955,10 @@ class JLCPCBTools(wx.Dialog):
             warnings = self.fabrication.get_part_consistency_warnings()
             if warnings:
                 result = wx.MessageBox(
-                    "There are items with identical LCSC number but different values in the list:\n"
+                    "列表中存在相同 LCSC 编号但不同值的元件:\n"
                     + warnings
-                    + "Continue?",
-                    "Plausibility check",
+                    + "是否继续？",
+                    "合理性检查",
                     wx.OK | wx.CANCEL | wx.CENTER,
                 )
                 if result == wx.CANCEL:
@@ -960,16 +968,16 @@ class JLCPCBTools(wx.Dialog):
                 count = self.count_order_number_placeholders()
                 if count == 0:
                     result = wx.MessageBox(
-                        "JLC order/serial number placeholder not present! Continue?",
-                        "JLC order/serial number placeholder",
+                        "未找到 JLC 订单号/序列号占位符！是否继续？",
+                        "JLC 订单号/序列号占位符",
                         wx.OK | wx.CANCEL | wx.CENTER,
                     )
                     if result == wx.CANCEL:
                         return
                 elif count > 1:
                     result = wx.MessageBox(
-                        "Multiple order/serial number placeholders present! Continue?",
-                        "JLC order/serial number placeholder",
+                        "存在多个订单号/序列号占位符！是否继续？",
+                        "JLC 订单号/序列号占位符",
                         wx.OK | wx.CANCEL | wx.CENTER,
                     )
                     if result == wx.CANCEL:
@@ -994,9 +1002,9 @@ class JLCPCBTools(wx.Dialog):
             self.fabrication.generate_bom()
             self.logger.info("All fabrication files generated successfully!")
             wx.MessageBox(
-                "Fabrication data (Gerber, Excellon, BOM, CPL) generated successfully!\n"
-                f"Output: {self.fabrication.outputdir}",
-                "Success",
+                "生产文件 (Gerber、Excellon、BOM、CPL) 生成成功！\n"
+                f"输出目录: {self.fabrication.outputdir}",
+                "成功",
                 wx.OK | wx.ICON_INFORMATION,
             )
         except Exception as exc:
@@ -1004,8 +1012,8 @@ class JLCPCBTools(wx.Dialog):
             err = traceback.format_exc()
             self.logger.error("Fabrication generation FAILED:\n%s", err)
             wx.MessageBox(
-                f"Fabrication generation failed:\n{exc}\n\nSee the log panel for full details.",
-                "Error",
+                f"生产文件生成失败:\n{exc}\n\n请查看日志面板了解详情。",
+                "错误",
                 wx.OK | wx.ICON_ERROR,
             )
 
@@ -1068,7 +1076,7 @@ class JLCPCBTools(wx.Dialog):
         """Dialog to select schematics."""
         with wx.FileDialog(
             self,
-            "Select Schematics",
+            "选择原理图",
             self.project_path,
             self.schematic_name,
             "KiCad V6 Schematics (*.kicad_sch)|*.kicad_sch",
@@ -1120,13 +1128,13 @@ class JLCPCBTools(wx.Dialog):
         right_click_menu = wx.Menu()
 
         copy_lcsc = wx.MenuItem(
-            right_click_menu, ID_CONTEXT_MENU_COPY_LCSC, "Copy LCSC"
+            right_click_menu, ID_CONTEXT_MENU_COPY_LCSC, "复制 LCSC 编号"
         )
         right_click_menu.Append(copy_lcsc)
         right_click_menu.Bind(wx.EVT_MENU, self.copy_part_lcsc, copy_lcsc)
 
         paste_lcsc = wx.MenuItem(
-            right_click_menu, ID_CONTEXT_MENU_PASTE_LCSC, "Paste LCSC"
+            right_click_menu, ID_CONTEXT_MENU_PASTE_LCSC, "粘贴 LCSC 编号"
         )
         right_click_menu.Append(paste_lcsc)
         right_click_menu.Bind(wx.EVT_MENU, self.paste_part_lcsc, paste_lcsc)
@@ -1134,7 +1142,7 @@ class JLCPCBTools(wx.Dialog):
         correction_by_reference = wx.MenuItem(
             right_click_menu,
             ID_CONTEXT_MENU_ADD_ROT_BY_REFERENCE,
-            "Add Correction by reference",
+            "按位号添加修正",
         )
         right_click_menu.Append(correction_by_reference)
         right_click_menu.Bind(wx.EVT_MENU, self.add_correction, correction_by_reference)
@@ -1142,25 +1150,25 @@ class JLCPCBTools(wx.Dialog):
         correction_by_package = wx.MenuItem(
             right_click_menu,
             ID_CONTEXT_MENU_ADD_ROT_BY_PACKAGE,
-            "Add Correction by package",
+            "按封装添加修正",
         )
         right_click_menu.Append(correction_by_package)
         right_click_menu.Bind(wx.EVT_MENU, self.add_correction, correction_by_package)
 
         correction_by_name = wx.MenuItem(
-            right_click_menu, ID_CONTEXT_MENU_ADD_ROT_BY_NAME, "Add Correction by name"
+            right_click_menu, ID_CONTEXT_MENU_ADD_ROT_BY_NAME, "按名称添加修正"
         )
         right_click_menu.Append(correction_by_name)
         right_click_menu.Bind(wx.EVT_MENU, self.add_correction, correction_by_name)
 
         find_mapping = wx.MenuItem(
-            right_click_menu, ID_CONTEXT_MENU_FIND_MAPPING, "Find LCSC from Mappings"
+            right_click_menu, ID_CONTEXT_MENU_FIND_MAPPING, "从映射查找 LCSC"
         )
         right_click_menu.Append(find_mapping)
         right_click_menu.Bind(wx.EVT_MENU, self.search_foot_mapping, find_mapping)
 
         add_mapping = wx.MenuItem(
-            right_click_menu, ID_CONTEXT_MENU_ADD_MAPPING, "Add Footprint Mapping"
+            right_click_menu, ID_CONTEXT_MENU_ADD_MAPPING, "添加封装映射"
         )
         right_click_menu.Append(add_mapping)
         right_click_menu.Bind(wx.EVT_MENU, self.add_foot_mapping, add_mapping)

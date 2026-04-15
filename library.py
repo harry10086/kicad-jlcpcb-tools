@@ -553,6 +553,9 @@ class Library:
 
     def update(self):
         """Update the sqlite parts database from the JLCPCB CSV."""
+        if self.state == LibraryState.DOWNLOAD_RUNNING:
+            self.logger.warning("Database download is already in progress, skipping.")
+            return
         Thread(target=self.download).start()
 
     def download(self):

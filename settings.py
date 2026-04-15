@@ -16,7 +16,7 @@ class SettingsDialog(wx.Dialog):
             self,
             parent,
             id=wx.ID_ANY,
-            title="JLCPCB tools settings",
+            title="JLCPCB 工具设置",
             pos=wx.DefaultPosition,
             size=HighResWxSize(parent.window, wx.Size(1300, 800)),
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.MAXIMIZE_BOX,
@@ -47,7 +47,7 @@ class SettingsDialog(wx.Dialog):
         self.tented_vias_setting = wx.CheckBox(
             self,
             id=wx.ID_ANY,
-            label="Do not tent vias",
+            label="不覆盖过孔",
             pos=wx.DefaultPosition,
             size=wx.DefaultSize,
             style=0,
@@ -55,7 +55,7 @@ class SettingsDialog(wx.Dialog):
         )
 
         self.tented_vias_setting.SetToolTip(
-            wx.ToolTip("Whether vias should be coverd by soldermask or not")
+            wx.ToolTip("过孔是否应被阻组层覆盖")
         )
 
         self.tented_vias_image = wx.StaticBitmap(
@@ -78,7 +78,7 @@ class SettingsDialog(wx.Dialog):
         self.fill_zones_setting = wx.CheckBox(
             self,
             id=wx.ID_ANY,
-            label="Fill zones",
+            label="填充区域",
             pos=wx.DefaultPosition,
             size=wx.DefaultSize,
             style=0,
@@ -86,7 +86,7 @@ class SettingsDialog(wx.Dialog):
         )
 
         self.fill_zones_setting.SetToolTip(
-            wx.ToolTip("Whether zones should be filled on gerber generation")
+            wx.ToolTip("生成 Gerber 时是否填充区域")
         )
 
         self.fill_zones_image = wx.StaticBitmap(
@@ -109,7 +109,7 @@ class SettingsDialog(wx.Dialog):
         self.plot_values_setting = wx.CheckBox(
             self,
             id=wx.ID_ANY,
-            label="Plot values",
+            label="绘制值",
             pos=wx.DefaultPosition,
             size=wx.DefaultSize,
             style=0,
@@ -117,7 +117,7 @@ class SettingsDialog(wx.Dialog):
         )
 
         self.plot_values_setting.SetToolTip(
-            wx.ToolTip("Whether value should be plotted on gerber generation")
+            wx.ToolTip("生成 Gerber 时是否绘制值")
         )
 
         self.plot_values_image = wx.StaticBitmap(
@@ -140,7 +140,7 @@ class SettingsDialog(wx.Dialog):
         self.plot_references_setting = wx.CheckBox(
             self,
             id=wx.ID_ANY,
-            label="Plot references",
+            label="绘制位号",
             pos=wx.DefaultPosition,
             size=wx.DefaultSize,
             style=0,
@@ -148,7 +148,7 @@ class SettingsDialog(wx.Dialog):
         )
 
         self.plot_references_setting.SetToolTip(
-            wx.ToolTip("Whether value should be plotted on gerber generation")
+            wx.ToolTip("生成 Gerber 时是否绘制位号")
         )
 
         self.plot_references_image = wx.StaticBitmap(
@@ -173,7 +173,7 @@ class SettingsDialog(wx.Dialog):
         self.lcsc_priority_setting = wx.CheckBox(
             self,
             id=wx.ID_ANY,
-            label="LCSC number priority",
+            label="LCSC 编号优先级",
             pos=wx.DefaultPosition,
             size=wx.DefaultSize,
             style=0,
@@ -182,7 +182,7 @@ class SettingsDialog(wx.Dialog):
 
         self.lcsc_priority_setting.SetToolTip(
             wx.ToolTip(
-                "Whether LCSC number from schematic should overrule those in the database"
+                "原理图中的 LCSC 编号是否优先于数据库中的"
             )
         )
 
@@ -206,7 +206,7 @@ class SettingsDialog(wx.Dialog):
         self.lcsc_bom_cpl_setting = wx.CheckBox(
             self,
             id=wx.ID_ANY,
-            label="Add parts without LCSC numbers to BOM/CPL",
+            label="将无 LCSC 编号的元件添加到 BOM/CPL",
             pos=wx.DefaultPosition,
             size=wx.DefaultSize,
             style=0,
@@ -214,7 +214,7 @@ class SettingsDialog(wx.Dialog):
         )
 
         self.lcsc_bom_cpl_setting.SetToolTip(
-            wx.ToolTip("Whether parts wihout LCSC number should be added to BOM/CPL")
+            wx.ToolTip("无 LCSC 编号的元件是否应添加到 BOM/CPL")
         )
 
         self.lcsc_bom_cpl_image = wx.StaticBitmap(
@@ -237,7 +237,7 @@ class SettingsDialog(wx.Dialog):
         self.order_number_setting = wx.CheckBox(
             self,
             id=wx.ID_ANY,
-            label="Check if an order/serial number placeholder is placed",
+            label="检查是否放置了订单号/序列号占位符",
             pos=wx.DefaultPosition,
             size=wx.DefaultSize,
             style=0,
@@ -245,7 +245,7 @@ class SettingsDialog(wx.Dialog):
         )
 
         self.order_number_setting.SetToolTip(
-            wx.ToolTip("Is an order/serial number placeholder placed")
+            wx.ToolTip("是否放置了订单号/序列号占位符")
         )
 
         self.order_number_image = wx.StaticBitmap(
@@ -268,7 +268,7 @@ class SettingsDialog(wx.Dialog):
         self.szlcsc_online_search_setting = wx.CheckBox(
             self,
             id=wx.ID_ANY,
-            label="Use SZLCSC online search",
+            label="使用立创商城在线搜索",
             pos=wx.DefaultPosition,
             size=wx.DefaultSize,
             style=0,
@@ -276,7 +276,7 @@ class SettingsDialog(wx.Dialog):
         )
 
         self.szlcsc_online_search_setting.SetToolTip(
-            wx.ToolTip("Whether to use the SZLCSC online database for part searches")
+            wx.ToolTip("是否使用立创商城在线数据库搜索元件")
         )
 
         self.szlcsc_online_search_image = wx.StaticBitmap(
@@ -317,13 +317,13 @@ class SettingsDialog(wx.Dialog):
         """Update settings dialog according to the settings."""
         if tented:
             self.tented_vias_setting.SetValue(tented)
-            self.tented_vias_setting.SetLabel("Tented vias")
+            self.tented_vias_setting.SetLabel("覆盖过孔")
             self.tented_vias_image.SetBitmap(
                 loadBitmapScaled("tented.png", self.parent.scale_factor, static=True)
             )
         else:
             self.tented_vias_setting.SetValue(tented)
-            self.tented_vias_setting.SetLabel("Untented vias")
+            self.tented_vias_setting.SetLabel("不覆盖过孔")
             self.tented_vias_image.SetBitmap(
                 loadBitmapScaled("untented.png", self.parent.scale_factor, static=True)
             )
@@ -332,7 +332,7 @@ class SettingsDialog(wx.Dialog):
         """Update settings dialog according to the settings."""
         if fill:
             self.fill_zones_setting.SetValue(fill)
-            self.fill_zones_setting.SetLabel("Fill zones")
+            self.fill_zones_setting.SetLabel("填充区域")
             self.fill_zones_image.SetBitmap(
                 loadBitmapScaled(
                     "fill-zones.png", self.parent.scale_factor, static=True
@@ -340,7 +340,7 @@ class SettingsDialog(wx.Dialog):
             )
         else:
             self.fill_zones_setting.SetValue(fill)
-            self.fill_zones_setting.SetLabel("Don't fill zones")
+            self.fill_zones_setting.SetLabel("不填充区域")
             self.fill_zones_image.SetBitmap(
                 loadBitmapScaled(
                     "unfill-zones.png", self.parent.scale_factor, static=True
@@ -351,7 +351,7 @@ class SettingsDialog(wx.Dialog):
         """Update settings dialog according to the settings."""
         if plot_values:
             self.plot_values_setting.SetValue(plot_values)
-            self.plot_values_setting.SetLabel("Plot values on silkscreen")
+            self.plot_values_setting.SetLabel("在丝印层绘制值")
             self.plot_values_image.SetBitmap(
                 loadBitmapScaled(
                     "plot_values.png", self.parent.scale_factor, static=True
@@ -359,7 +359,7 @@ class SettingsDialog(wx.Dialog):
             )
         else:
             self.plot_values_setting.SetValue(plot_values)
-            self.plot_values_setting.SetLabel("Don't plot values on silkscreen")
+            self.plot_values_setting.SetLabel("不在丝印层绘制值")
             self.plot_values_image.SetBitmap(
                 loadBitmapScaled("no_values.png", self.parent.scale_factor, static=True)
             )
@@ -368,13 +368,13 @@ class SettingsDialog(wx.Dialog):
         """Update settings dialog according to the settings."""
         if plot_references:
             self.plot_references_setting.SetValue(plot_references)
-            self.plot_references_setting.SetLabel("Plot references on silkscreen")
+            self.plot_references_setting.SetLabel("在丝印层绘制位号")
             self.plot_references_image.SetBitmap(
                 loadBitmapScaled("plot_refs.png", self.parent.scale_factor, static=True)
             )
         else:
             self.plot_references_setting.SetValue(plot_references)
-            self.plot_references_setting.SetLabel("Don't plot references on silkscreen")
+            self.plot_references_setting.SetLabel("不在丝印层绘制位号")
             self.plot_references_image.SetBitmap(
                 loadBitmapScaled("no_refs.png", self.parent.scale_factor, static=True)
             )
@@ -384,7 +384,7 @@ class SettingsDialog(wx.Dialog):
         if priority:
             self.lcsc_priority_setting.SetValue(priority)
             self.lcsc_priority_setting.SetLabel(
-                "LCSC numbers from schematic have priority"
+                "原理图的 LCSC 编号优先"
             )
             self.lcsc_priority_image.SetBitmap(
                 loadBitmapScaled("schematic.png", self.parent.scale_factor, static=True)
@@ -392,7 +392,7 @@ class SettingsDialog(wx.Dialog):
         else:
             self.lcsc_priority_setting.SetValue(priority)
             self.lcsc_priority_setting.SetLabel(
-                "LCSC numbers from database have priority"
+                "数据库的 LCSC 编号优先"
             )
             self.lcsc_priority_image.SetBitmap(
                 loadBitmapScaled(
@@ -405,7 +405,7 @@ class SettingsDialog(wx.Dialog):
         if add:
             self.lcsc_bom_cpl_setting.SetValue(add)
             self.lcsc_bom_cpl_setting.SetLabel(
-                "Add parts without LCSC number to BOM/POS"
+                "将无 LCSC 编号的元件添加到 BOM/POS"
             )
             self.lcsc_bom_cpl_image.SetBitmap(
                 loadBitmapScaled("bom.png", self.parent.scale_factor, static=True)
@@ -413,7 +413,7 @@ class SettingsDialog(wx.Dialog):
         else:
             self.lcsc_bom_cpl_setting.SetValue(add)
             self.lcsc_bom_cpl_setting.SetLabel(
-                "Don't add parts without LCSC number to BOM/POS"
+                "不将无 LCSC 编号的元件添加到 BOM/POS"
             )
             self.lcsc_bom_cpl_image.SetBitmap(
                 loadBitmapScaled("no_bom.png", self.parent.scale_factor, static=True)
@@ -425,7 +425,7 @@ class SettingsDialog(wx.Dialog):
         if check:
             self.order_number_setting.SetValue(check)
             self.order_number_setting.SetLabel(
-                "Check if an order/serial number placeholder is placed"
+                "检查是否放置了订单号/序列号占位符"
             )
             self.order_number_image.SetBitmap(
                 loadBitmapScaled(
@@ -435,7 +435,7 @@ class SettingsDialog(wx.Dialog):
         else:
             self.order_number_setting.SetValue(check)
             self.order_number_setting.SetLabel(
-                "Don't check if an order/serial number placeholder is placed"
+                "不检查订单号/序列号占位符"
             )
             self.order_number_image.SetBitmap(
                 loadBitmapScaled(
@@ -448,7 +448,7 @@ class SettingsDialog(wx.Dialog):
         if use_online:
             self.szlcsc_online_search_setting.SetValue(use_online)
             self.szlcsc_online_search_setting.SetLabel(
-                "Use SZLCSC online search"
+                "使用立创商城在线搜索"
             )
             self.szlcsc_online_search_image.SetBitmap(
                 loadBitmapScaled("mdi-database-search-outline.png", self.parent.scale_factor, static=True)
@@ -456,7 +456,7 @@ class SettingsDialog(wx.Dialog):
         else:
             self.szlcsc_online_search_setting.SetValue(use_online)
             self.szlcsc_online_search_setting.SetLabel(
-                "Use offline SQLite database"
+                "使用离线 SQLite 数据库"
             )
             self.szlcsc_online_search_image.SetBitmap(
                 loadBitmapScaled(

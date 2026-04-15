@@ -20,7 +20,7 @@ class CorrectionManagerDialog(wx.Dialog):
             self,
             parent,
             id=wx.ID_ANY,
-            title="Corrections Manager",
+            title="修正管理器",
             pos=wx.DefaultPosition,
             size=HighResWxSize(parent.window, wx.Size(800, 800)),
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.MAXIMIZE_BOX,
@@ -147,7 +147,7 @@ class CorrectionManagerDialog(wx.Dialog):
         self.offset_x.Bind(wx.EVT_TEXT, self.on_textfield_change)
         self.offset_y.Bind(wx.EVT_TEXT, self.on_textfield_change)
 
-        add_edit_sizer = wx.StaticBoxSizer(wx.HORIZONTAL, self, "Add / Edit")
+        add_edit_sizer = wx.StaticBoxSizer(wx.HORIZONTAL, self, "添加 / 编辑")
         add_edit_sizer.Add(sizer_regex, 0, wx.RIGHT, 20)
         add_edit_sizer.Add(sizer_rotation, 0, wx.RIGHT, 20)
         add_edit_sizer.Add(sizer_offset_x, 0, wx.RIGHT, 20)
@@ -209,7 +209,7 @@ class CorrectionManagerDialog(wx.Dialog):
         self.save_button = wx.Button(
             self,
             wx.ID_ANY,
-            "Save",
+            "保存",
             wx.DefaultPosition,
             HighResWxSize(parent.window, wx.Size(150, -1)),
             0,
@@ -217,7 +217,7 @@ class CorrectionManagerDialog(wx.Dialog):
         self.delete_button = wx.Button(
             self,
             wx.ID_ANY,
-            "Delete",
+            "删除",
             wx.DefaultPosition,
             HighResWxSize(parent.window, wx.Size(150, -1)),
             0,
@@ -225,7 +225,7 @@ class CorrectionManagerDialog(wx.Dialog):
         self.update_button = wx.Button(
             self,
             wx.ID_ANY,
-            "Update",
+            "更新",
             wx.DefaultPosition,
             HighResWxSize(parent.window, wx.Size(150, -1)),
             0,
@@ -233,7 +233,7 @@ class CorrectionManagerDialog(wx.Dialog):
         self.import_button = wx.Button(
             self,
             wx.ID_ANY,
-            "Import",
+            "导入",
             wx.DefaultPosition,
             HighResWxSize(parent.window, wx.Size(150, -1)),
             0,
@@ -241,7 +241,7 @@ class CorrectionManagerDialog(wx.Dialog):
         self.export_button = wx.Button(
             self,
             wx.ID_ANY,
-            "Export",
+            "导出",
             wx.DefaultPosition,
             HighResWxSize(parent.window, wx.Size(150, -1)),
             0,
@@ -296,7 +296,7 @@ class CorrectionManagerDialog(wx.Dialog):
         self.global_corrections = wx.CheckBox(
             self,
             id=wx.ID_ANY,
-            label="Use global corrections",
+            label="使用全局修正",
             pos=wx.DefaultPosition,
             size=wx.DefaultSize,
             style=0,
@@ -305,7 +305,7 @@ class CorrectionManagerDialog(wx.Dialog):
 
         self.global_corrections.SetToolTip(
             wx.ToolTip(
-                "Whether the global corrections database is used or a project local one"
+                "是使用全局修正数据库还是项目本地数据库"
             )
         )
         self.global_corrections.Bind(
@@ -462,25 +462,25 @@ class CorrectionManagerDialog(wx.Dialog):
 
                     dialog = wx.MessageDialog(
                         self,
-                        f"A rule for '{regex}' already exists!",
-                        "Regex exists!",
+                        f"'{regex}' 的规则已存在！",
+                        "正则表达式已存在！",
                         wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION,
                     )
                     if self.selection_regex is None:
                         # The user entered a regex that already exists with different values.
-                        dialog.ExtendedMessage = "Do you want to update the corrections " + \
+                        dialog.ExtendedMessage = "是否要将修正 " + \
                            existing_correction + \
-                           " to " + \
+                           " 更新为 " + \
                            new_correction
                     else:
                         # The user has selected regex_a, changed it to regex_b
                         # (but regex_b exists).
-                        dialog.ExtendedMessage = "Do you want to replace the corrections " + \
+                        dialog.ExtendedMessage = "是否要将修正 " + \
                            existing_correction + \
-                           " with " + \
+                           " 替换为 " + \
                            new_correction + \
-                           ",\n" + \
-                           f"removing the rule for '{self.selection_regex}'?"
+                           "\uff0c\n" + \
+                           f"并删除 '{self.selection_regex}' 的规则？"
                     result = dialog.ShowModal()
 
                     if result == wx.ID_YES:
@@ -548,16 +548,16 @@ class CorrectionManagerDialog(wx.Dialog):
         if self.parent.library.uses_global_correction_database():
             dialog = wx.MessageDialog(
                 self,
-                "Do you want to switch to the local corrections database?",
-                "Switching corrections database",
+                "是否要切换到本地修正数据库？",
+                "切换修正数据库",
                 wx.YES_NO | wx.YES_DEFAULT | wx.ICON_QUESTION,
             )
-            dialog.ExtendedMessage = "Switching to a board local database copies the current global database."
+            dialog.ExtendedMessage = "切换到板级本地数据库会复制当前全局数据库。"
         else:
             dialog = wx.MessageDialog(
                 self,
-                "Do you want to switch to the global corrections database?",
-                "Switching corrections database",
+                "是否要切换到全局修正数据库？",
+                "切换修正数据库",
                 wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING,
             )
         result = dialog.ShowModal()
@@ -618,7 +618,7 @@ class CorrectionManagerDialog(wx.Dialog):
         """Dialog to import correctios from a CSV file."""
         with wx.FileDialog(
             self,
-            "Import",
+            "导入",
             "",
             "",
             "CSV files (*.csv)|*.csv",
@@ -633,7 +633,7 @@ class CorrectionManagerDialog(wx.Dialog):
         """Dialog to export correctios to a CSV file."""
         with wx.FileDialog(
             self,
-            "Export",
+            "导出",
             "",
             "",
             "CSV files (*.csv)|*.csv",
