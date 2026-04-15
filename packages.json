@@ -25,6 +25,15 @@
             },
             "versions": [
                 {
+                    "version": "3.7.8",
+                    "status": "testing",
+                    "kicad_version": "6.0",
+                    "download_sha256": "ea7ff43f5f4e034c64cdedb38eb92e93e5cfb71308f1ac372ea3b0135c038e56",
+                    "download_size": 206715,
+                    "download_url": "https://github.com/harry10086/kicad-jlcpcb-tools/releases/download/v3.7.8/KiCAD-PCM-3.7.8.zip",
+                    "install_size": 615351
+                },
+                {
                     "version": "3.7.7",
                     "status": "testing",
                     "kicad_version": "6.0",
