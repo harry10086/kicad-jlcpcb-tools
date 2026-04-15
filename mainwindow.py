@@ -587,9 +587,34 @@ class JLCPCBTools(wx.Dialog):
             params = getattr(e, "params", "")
             if not params:
                 params = params_for_part(self.library.get_part_details(e.lcsc))
-            # Write description to LCSC Params KiCad footprint field so it persists
             if params and fp:
+                # Add or update the "LCSC Params" field
                 fp.SetField("LCSC Params", params)
+                
+                # Fetch field to configure visibility and layer
+                # Try all approaches to find the field since KiCad versions differ heavily here
+                param_field = None
+                with suppress(Exception):
+                    param_field = fp.GetFieldByName("LCSC Params")
+                    
+                if param_field is None:
+                    with suppress(Exception):
+                        for field in fp.GetFields():
+                            if field.GetName() == "LCSC Params":
+                                param_field = field
+                                break
+                                
+                if param_field is not None:
+                    param_field.SetVisible(False)
+                    param_field.SetLayer(kicad_pcbnew.F_Fab)
+                else:
+                    # In some KiCad versions, SetField just adds text elements
+                    with suppress(Exception):
+                        for item in fp.GraphicalItems():
+                            if hasattr(item, "GetText") and item.GetText() == params:
+                                item.SetVisible(False)
+                                item.SetLayer(kicad_pcbnew.F_Fab)
+                                
             self.partlist_data_model.set_lcsc(
                 reference, e.lcsc, getattr(e, "type", ""), stock_str, params
             )
@@ -880,14 +905,6 @@ class JLCPCBTools(wx.Dialog):
             ref = self.partlist_data_model.get_reference(item)
             value = self.partlist_data_model.get_value(item)
             footprint = self.partlist_data_model.get_footprint(item)
-            if ref.startswith("R"):
-                """ Auto remove alphabet unit if applicable """
-                if value.endswith("R") or value.endswith("r") or value.endswith("o"):
-                    value = value[:-1]
-                value += "Ω"
-            m = re.search(r"_(\d+)_\d+Metric", footprint)
-            if m:
-                value += f" {m.group(1)}"
             selection[ref] = value
         PartSelectorDialog(self, selection).ShowModal()
 
