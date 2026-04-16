@@ -1,0 +1,15 @@
+exclude = ["PCM"]
+
+[lint]
+# D: Docstring issues
+# T201: print() found
+# G004: f-string in logging
+# PLC0415: import not at top level
+# SIM105: try-except-pass instead of contextlib.suppress
+ignore = [
+    "D",
+    "T201",
+    "G004",
+    "PLC0415",
+    "SIM105",
+]

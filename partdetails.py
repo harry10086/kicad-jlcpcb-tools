@@ -160,7 +160,6 @@ class PartDetailsDialog(wx.Dialog):
             text = []
             for item in self.data_list.GetSelections():
                 row = self.data_list.ItemToRow(item)
-                key = self.data_list.GetTextValue(row, 0)
                 val = self.data_list.GetTextValue(row, 1)
                 text.append(f"{val}")
 

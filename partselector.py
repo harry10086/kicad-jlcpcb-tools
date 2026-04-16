@@ -521,7 +521,7 @@ class PartSelectorDialog(wx.Dialog):
 
         # Auto-update package combobox
         current_pkg = self.package.GetValue()
-        unique_packages = sorted(list(set(item[2] for item in self.current_search_results if len(item) > 2 and item[2])))
+        unique_packages = sorted({item[2] for item in self.current_search_results if len(item) > 2 and item[2]})
         self.package.Clear()
         self.package.AppendItems([""] + unique_packages)
         self.package.SetValue(current_pkg)
