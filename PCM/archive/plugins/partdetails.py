@@ -7,7 +7,6 @@ import webbrowser
 import wx  # pylint: disable=import-error
 import wx.dataview  # pylint: disable=import-error
 
-from .events import MessageEvent
 from .helpers import HighResWxSize, loadBitmapScaled
 from .lcsc_api import LCSC_API
 
@@ -145,7 +144,7 @@ class PartDetailsDialog(wx.Dialog):
         # Add Ctrl+C support
         copy_id = wx.NewIdRef()
         self.Bind(wx.EVT_MENU, self.copy_to_clipboard, id=copy_id)
-        accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord('C'), copy_id)])
+        accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord("C"), copy_id)])
         self.SetAcceleratorTable(accel_tbl)
 
         self.get_part_data()
@@ -164,7 +163,7 @@ class PartDetailsDialog(wx.Dialog):
                 key = self.data_list.GetTextValue(row, 0)
                 val = self.data_list.GetTextValue(row, 1)
                 text.append(f"{val}")
-            
+
             clip_text = "\n".join(text)
             if wx.TheClipboard.Open():
                 wx.TheClipboard.SetData(wx.TextDataObject(clip_text))
@@ -191,18 +190,18 @@ class PartDetailsDialog(wx.Dialog):
 
     def get_part_data(self):
         """Get part data from API and parse it into the table, set picture and PDF link."""
-        
+
         use_szlcsc = self.parent.settings.get("general", {}).get("szlcsc_online_search", True)
-        
+
         if use_szlcsc:
             result = self.lcsc_api.get_part_data_szlcsc(self.part)
             if not result.get("success"):
                 self.report_part_data_fetch_error(result.get("msg", "Unknown error"))
                 return
-                
+
             item = result["data"]
             vo = item.get("productVO") or {}
-            
+
             parameters = {
                 "productCode": "LCSC Part",
                 "productModel": "MFR.Part",
@@ -212,22 +211,22 @@ class PartDetailsDialog(wx.Dialog):
                 "productName": "Description",
                 "stockNumber": "Stock",
             }
-            
+
             smt_label = vo.get("smtLabel", "")
             if smt_label:
                 self.data_list.AppendItem(["Type", smt_label])
-                
+
             for k, v in parameters.items():
                 val = vo.get(k)
                 if val is not None:
                     self.data_list.AppendItem([v, str(val)])
-                    
+
             prices = vo.get("productPriceList", [])
             for p in prices:
                 start = p.get("spuStartNumber") or p.get("number", 1)
                 price_val = p.get("productPrice", 0)
                 self.data_list.AppendItem([f"Price for >{start}", f"¥{price_val}"])
-                
+
             picture = vo.get("bigImageUrl") or vo.get("breviaryImageUrl") or ""
             if picture:
                 if picture.startswith("//"):
@@ -251,7 +250,7 @@ class PartDetailsDialog(wx.Dialog):
             if not result.get("success"):
                 self.report_part_data_fetch_error(result.get("msg", "Unknown error"))
                 return
-    
+
             parameters = {
                 "componentCode": "Component Code",
                 "firstTypeNameEn": "Primary Category",

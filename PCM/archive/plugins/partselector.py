@@ -7,7 +7,6 @@ import wx  # pylint: disable=import-error
 import wx.dataview as dv  # pylint: disable=import-error
 
 from .datamodel import PartSelectorDataModel
-from .derive_params import params_for_part  # pylint: disable=import-error
 from .events import AssignPartsEvent, UpdateSetting
 from .helpers import HighResWxSize, loadBitmapScaled
 from .partdetails import PartDetailsDialog
@@ -228,7 +227,7 @@ class PartSelectorDialog(wx.Dialog):
         self.result_count = wx.StaticText(
             self, wx.ID_ANY, "0 条结果", wx.DefaultPosition, wx.DefaultSize
         )
-        
+
         self.load_more_button = wx.Button(
             self,
             wx.ID_ANY,
@@ -408,7 +407,7 @@ class PartSelectorDialog(wx.Dialog):
 
         self.current_page = 1
         self.current_search_results = []
-        
+
         self.SetSizer(layout)
         self.Layout()
         self.Centre(wx.BOTH)
@@ -427,7 +426,7 @@ class PartSelectorDialog(wx.Dialog):
                 value=event.GetEventObject().GetValue(),
             ),
         )
-        
+
         # Apply local filters instead of running network search
         self.apply_local_filters(0)
 
@@ -493,13 +492,13 @@ class PartSelectorDialog(wx.Dialog):
             "keyword": self.keyword.GetValue(),
             "package": self.package.GetValue(),
         }
-        
+
         self.result_count.SetLabel("加载中...")
         self.Update()
 
         start = time.time()
         use_szlcsc_online = self.parent.settings.get("general", {}).get("szlcsc_online_search", True)
-        
+
         new_results = []
         if use_szlcsc_online:
             if self.current_page == 1:
@@ -509,7 +508,7 @@ class PartSelectorDialog(wx.Dialog):
                 self.current_page = 2
             else:
                 new_results = self.parent.library.search(parameters, page=self.current_page)
-             
+
             if new_results:
                 self.load_more_button.Enable()
             else:
@@ -519,16 +518,16 @@ class PartSelectorDialog(wx.Dialog):
             new_results = self.parent.library.search(parameters)
 
         self.current_search_results.extend(new_results)
-        
+
         # Auto-update package combobox
         current_pkg = self.package.GetValue()
         unique_packages = sorted(list(set(item[2] for item in self.current_search_results if len(item) > 2 and item[2])))
         self.package.Clear()
         self.package.AppendItems([""] + unique_packages)
         self.package.SetValue(current_pkg)
-        
+
         search_duration = time.time() - start
-        
+
         self.apply_local_filters(search_duration)
 
     def apply_local_filters(self, search_duration):
@@ -537,7 +536,7 @@ class PartSelectorDialog(wx.Dialog):
         extended = self.extended_checkbox.GetValue()
         stock_filter_str = self.stock_filter.GetValue()
         package_filter = self.package.GetValue().lower()
-        
+
         min_stock = 0
         if stock_filter_str == ">0":
             min_stock = 1
@@ -547,15 +546,15 @@ class PartSelectorDialog(wx.Dialog):
             min_stock = 101
         elif stock_filter_str == ">1000":
             min_stock = 1001
-        
+
         filtered = []
-        
+
         for item in self.current_search_results:
-            
+
             # Type is at index 4, Stock is at index 5, Package is at index 2
             if len(item) < 6:
                 continue
-                
+
             item_package = item[2].lower() if item[2] else ""
             item_type = item[4]
             stock_str = item[5]
@@ -563,36 +562,36 @@ class PartSelectorDialog(wx.Dialog):
                 item_stock = int(stock_str)
             except ValueError:
                 item_stock = 0
-                
+
             if item_stock < min_stock:
                 continue
-                
+
             if package_filter and package_filter not in item_package:
                 continue
-                
+
             if basic and not extended and item_type != "Basic":
                 continue
             if extended and not basic and item_type != "Extended":
                 continue
             if basic and extended and item_type not in ("Basic", "Extended"):
                 continue
-                
+
             filtered.append(item)
-            
+
         self.populate_part_list(filtered, search_duration)
 
     def get_price(self, quantity, prices) -> float:
         """Find the price for the number of selected parts accordning to the price ranges."""
         if not prices:
             return -1.0
-        
+
         # Check if the price is a single scalar from the online API instead of a range string
         if ":" not in prices and "-" not in prices:
             try:
                 return float(prices)
             except ValueError:
                 return -1.0
-                
+
         price_ranges = prices.split(",")
         if not price_ranges[0]:
             return -1.0

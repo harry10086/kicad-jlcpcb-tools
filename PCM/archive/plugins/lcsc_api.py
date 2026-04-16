@@ -58,23 +58,23 @@ class LCSC_API:
             )
         except requests.exceptions.RequestException as e:
             return {"success": False, "msg": f"Request failed: {e}"}
-            
+
         if r.status_code != requests.codes.ok:
             return {"success": False, "msg": f"non-OK HTTP response: {r.status_code}"}
-        
+
         try:
             raw = r.json()
         except ValueError:
             return {"success": False, "msg": "Invalid JSON response"}
-            
+
         if raw.get("code") != 200:
             return {"success": False, "msg": f"API error {raw.get('code')}: {raw.get('msg')}"}
-            
+
         search_result = (raw.get("result") or {}).get("searchResult") or {}
         items = search_result.get("productRecordList") or []
         if not items:
             return {"success": False, "msg": "No exact match found"}
-            
+
         return {"success": True, "data": items[0]}
 
 
@@ -117,28 +117,28 @@ class LCSC_API:
             )
         except requests.exceptions.RequestException as e:
             return {"success": False, "msg": f"Request failed: {e}"}
-            
+
         if r.status_code != requests.codes.ok:
             return {"success": False, "msg": f"non-OK HTTP response: {r.status_code}"}
-        
+
         try:
             raw = r.json()
         except ValueError:
             return {"success": False, "msg": "Invalid JSON response"}
-            
+
         if raw.get("code") != 200:
             return {"success": False, "msg": f"API error {raw.get('code')}: {raw.get('msg')}"}
-            
+
         search_result = (raw.get("result") or {}).get("searchResult") or {}
         total = search_result.get("totalCount", 0)
         items = search_result.get("productRecordList") or []
-        
+
         results = []
         _SMT_LABEL_MAP = {
             "SMT基础库": "Basic",
             "SMT扩展库": "Extended",
         }
-        
+
         for item in items:
             vo = item.get("productVO") or {}
             prices = vo.get("productPriceList") or []
@@ -146,11 +146,11 @@ class LCSC_API:
             product_id = vo.get("productId", "")
             url = f"https://item.szlcsc.com/{product_id}.html" if product_id else ""
             smt_label = vo.get("smtLabel", "")
-            
+
             # The API also provides datasheet, though it isn't completely obvious
             # We'll use getComponentDetail to get datasheet lazily, but also try to get it if present
             datasheet = vo.get("pdfUrl", "") or ""
-            
+
             results.append({
                 "lcsc": vo.get("productCode", ""),
                 "mfr_no": vo.get("productModel", ""),
@@ -165,5 +165,5 @@ class LCSC_API:
                 "datasheet": datasheet,
                 "joints": 0,
             })
-            
+
         return {"success": True, "total": total, "results": results}

@@ -19,17 +19,9 @@ from .datamodel import PartListDataModel
 from .derive_params import params_for_part
 from .events import (
     EVT_ASSIGN_PARTS_EVENT,
-    EVT_DOWNLOAD_COMPLETED_EVENT,
-    EVT_DOWNLOAD_PROGRESS_EVENT,
-    EVT_DOWNLOAD_STARTED_EVENT,
     EVT_LOGBOX_APPEND_EVENT,
     EVT_MESSAGE_EVENT,
     EVT_POPULATE_FOOTPRINT_LIST_EVENT,
-    EVT_UNZIP_COMBINING_PROGRESS_EVENT,
-    EVT_UNZIP_COMBINING_STARTED_EVENT,
-    EVT_UNZIP_EXTRACTING_COMPLETED_EVENT,
-    EVT_UNZIP_EXTRACTING_PROGRESS_EVENT,
-    EVT_UNZIP_EXTRACTING_STARTED_EVENT,
     EVT_UPDATE_SETTING,
     LogboxAppendEvent,
 )
@@ -590,20 +582,20 @@ class JLCPCBTools(wx.Dialog):
             if params and fp:
                 # Add or update the "LCSC Params" field
                 fp.SetField("LCSC Params", params)
-                
+
                 # Fetch field to configure visibility and layer
                 # Try all approaches to find the field since KiCad versions differ heavily here
                 param_field = None
                 with suppress(Exception):
                     param_field = fp.GetFieldByName("LCSC Params")
-                    
+
                 if param_field is None:
                     with suppress(Exception):
                         for field in fp.GetFields():
                             if field.GetName() == "LCSC Params":
                                 param_field = field
                                 break
-                                
+
                 if param_field is not None:
                     param_field.SetVisible(False)
                     param_field.SetLayer(kicad_pcbnew.F_Fab)
@@ -614,7 +606,7 @@ class JLCPCBTools(wx.Dialog):
                             if hasattr(item, "GetText") and item.GetText() == params:
                                 item.SetVisible(False)
                                 item.SetLayer(kicad_pcbnew.F_Fab)
-                                
+
             self.partlist_data_model.set_lcsc(
                 reference, e.lcsc, getattr(e, "type", ""), stock_str, params
             )
@@ -682,7 +674,7 @@ class JLCPCBTools(wx.Dialog):
             self.partlist_data_model.AddEntry(item_data)
             if fp and fp.IsSelected():
                 items_to_select.append(self.partlist_data_model.ObjectToItem(item_data))
-                
+
         if items_to_select:
             def apply_selection():
                 self.footprint_list.SetSelections(items_to_select)
@@ -904,7 +896,6 @@ class JLCPCBTools(wx.Dialog):
         for item in self.footprint_list.GetSelections():
             ref = self.partlist_data_model.get_reference(item)
             value = self.partlist_data_model.get_value(item)
-            footprint = self.partlist_data_model.get_footprint(item)
             selection[ref] = value
         PartSelectorDialog(self, selection).ShowModal()
 
@@ -999,7 +990,7 @@ class JLCPCBTools(wx.Dialog):
                     )
                     if result == wx.CANCEL:
                         return
-                    
+
             self.fabrication.fill_zones()
             layer_selection = self.layer_selection.GetSelection()
             number = re.search(r"\d+", self.layer_selection.GetString(layer_selection))

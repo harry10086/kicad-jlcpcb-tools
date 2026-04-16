@@ -8,7 +8,7 @@ from pathlib import Path
 import sqlite3
 from threading import Thread
 import time
-from typing import NamedTuple, Optional
+from typing import NamedTuple
 
 import requests  # pylint: disable=import-error
 import wx  # pylint: disable=import-error
@@ -82,7 +82,7 @@ class Library:
     def check_library(self):
         """Check if the database files exists, if not trigger update / create database."""
         use_szlcsc_online = self.parent.settings.get("general", {}).get("szlcsc_online_search", True)
-        
+
         if (
             not os.path.isfile(self.partsdb_file)
             or os.path.getsize(self.partsdb_file) == 0
@@ -311,22 +311,22 @@ class Library:
         """Search using the SZLCSC online API."""
         from .lcsc_api import LCSC_API
         api = LCSC_API()
-        
+
         keyword_parts = []
         if parameters.get("keyword"):
             keyword_parts.append(parameters["keyword"])
         if parameters.get("part_no"):
             keyword_parts.append(parameters["part_no"])
-        
+
         search_kw = " ".join(keyword_parts).strip()
         if not search_kw:
             return []
-            
+
         res = api.search_szlcsc(keyword=search_kw, page=page, page_size=30)
         if not res.get("success"):
             self.logger.error(f"SZLCSC API Error: {res.get('msg')}")
             return []
-            
+
         results = []
         for item in res.get("results", []):
             row = [
@@ -344,7 +344,7 @@ class Library:
                 item.get("datasheet", "")
             ]
             results.append(row)
-            
+
         return results
 
     def delete_parts_table(self):
@@ -522,7 +522,7 @@ class Library:
                         "package": "",
                         "category": ""
                     }
-                    
+
             # Try offline DB if it exists as fallback
             part_info = {}
             if os.path.isfile(self.partsdb_file) and os.path.getsize(self.partsdb_file) > 0:
@@ -876,7 +876,7 @@ class Library:
             except sqlite3.OperationalError:
                 return
 
-    def get_parts_db_info(self) -> Optional[PartsDatabaseInfo]:
+    def get_parts_db_info(self) -> PartsDatabaseInfo | None:
         """Retrieve the database information."""
         with contextlib.closing(sqlite3.connect(self.partsdb_file)) as con, con as cur:
             try:
