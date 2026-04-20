@@ -166,7 +166,7 @@ class Fabrication:
             for pad in pads:
                 bbox.Merge(pad.GetBoundingBox())
             return bbox.GetCenter()
-        except:
+        except Exception:
             self.logger.info(
                 "WARNING footprint %s: original position used", footprint.GetReference()
             )

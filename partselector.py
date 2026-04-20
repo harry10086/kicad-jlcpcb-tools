@@ -15,7 +15,7 @@ from .partdetails import PartDetailsDialog
 class PartSelectorDialog(wx.Dialog):
     """The part selector window."""
 
-    def __init__(self, parent, parts):
+    def __init__(self, parent, parts, initial_keyword=None):
         wx.Dialog.__init__(
             self,
             parent,
@@ -29,7 +29,12 @@ class PartSelectorDialog(wx.Dialog):
         self.logger = logging.getLogger(__name__)
         self.parent = parent
         self.parts = parts
-        lcsc_selection = self.get_existing_selection(parts)
+        # Prefer the explicitly given keyword (e.g. existing LCSC number);
+        # fall back to the common Value across selected parts.
+        if initial_keyword is not None:
+            lcsc_selection = initial_keyword
+        else:
+            lcsc_selection = self.get_existing_selection(parts)
 
         self.search_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.search)
@@ -260,7 +265,7 @@ class PartSelectorDialog(wx.Dialog):
         lcsc = self.part_list.AppendTextColumn(
             "LCSC",
             0,
-            width=int(parent.scale_factor * 60),
+            width=int(parent.scale_factor * 100),
             mode=dv.DATAVIEW_CELL_INERT,
             align=wx.ALIGN_CENTER,
         )

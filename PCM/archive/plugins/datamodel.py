@@ -134,10 +134,10 @@ class PartListDataModel(dv.PyDataViewModel):
 
     def find_index(self, ref):
         """Get the index of a part within the data list by its reference."""
-        try:
-            return self.data.index([x for x in self.data if x[0] == ref].pop())
-        except (ValueError, IndexError):
-            return None
+        for i, row in enumerate(self.data):
+            if row[self.columns["REF_COL"]] == ref:
+                return i
+        return None
 
     def get_bom_pos_icon(self, state: str):
         """Get an icon for a state."""

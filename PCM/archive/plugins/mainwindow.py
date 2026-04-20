@@ -561,55 +561,70 @@ class JLCPCBTools(wx.Dialog):
 
     def assign_parts(self, e):
         """Assign a selected LCSC number to parts."""
-        self.logger.info(f"Assigning {getattr(e, 'lcsc', 'None')}, TYPE={getattr(e, 'type', 'None')}, STOCK={getattr(e, 'stock', 'None')}, PARAMS={getattr(e, 'params', 'None')}")
-        if getattr(e, "lcsc", ""):
-            self.store.save_part_details_cache(
-                e.lcsc,
-                str(e.stock) if e.stock else "",
-                getattr(e, "type", ""),
-                getattr(e, "params", "")
-            )
-        stock_str = str(e.stock) if e.stock else ""
-        for reference in e.references:
-            self.store.set_lcsc(reference, e.lcsc)
-            self.store.set_stock(reference, stock_str)
-            board = self.pcbnew.GetBoard()
-            fp = board.FindFootprintByReference(reference)
-            set_lcsc_value(fp, e.lcsc)
-            params = getattr(e, "params", "")
-            if not params:
-                params = params_for_part(self.library.get_part_details(e.lcsc))
-            if params and fp:
-                # Add or update the "LCSC Params" field
-                fp.SetField("LCSC Params", params)
+        self.logger.info(f"assign_parts [v3.9.1] lcsc={getattr(e, 'lcsc', 'None')}, refs={list(getattr(e, 'references', []))}")
+        try:
+            if getattr(e, "lcsc", ""):
+                self.store.save_part_details_cache(
+                    e.lcsc,
+                    str(e.stock) if e.stock else "",
+                    getattr(e, "type", ""),
+                    getattr(e, "params", "")
+                )
+            stock_str = str(e.stock) if e.stock else ""
+            for reference in e.references:
+                self.logger.debug(f"assign_parts: processing ref={reference}, lcsc={e.lcsc}")
+                self.store.set_lcsc(reference, e.lcsc)
+                self.store.set_stock(reference, stock_str)
+                board = self.pcbnew.GetBoard()
+                fp = board.FindFootprintByReference(reference)
 
-                # Fetch field to configure visibility and layer
-                # Try all approaches to find the field since KiCad versions differ heavily here
-                param_field = None
-                with suppress(Exception):
-                    param_field = fp.GetFieldByName("LCSC Params")
+                # Write LCSC number to board footprint (wrapped in try/except to avoid breaking UI update)
+                try:
+                    set_lcsc_value(fp, e.lcsc)
+                except Exception as ex:
+                    self.logger.error(f"set_lcsc_value failed for {reference}: {ex}")
 
-                if param_field is None:
-                    with suppress(Exception):
-                        for field in fp.GetFields():
-                            if field.GetName() == "LCSC Params":
-                                param_field = field
-                                break
+                params = getattr(e, "params", "")
+                if not params:
+                    params = params_for_part(self.library.get_part_details(e.lcsc))
 
-                if param_field is not None:
-                    param_field.SetVisible(False)
-                    param_field.SetLayer(kicad_pcbnew.F_Fab)
-                else:
-                    # In some KiCad versions, SetField just adds text elements
-                    with suppress(Exception):
-                        for item in fp.GraphicalItems():
-                            if hasattr(item, "GetText") and item.GetText() == params:
-                                item.SetVisible(False)
-                                item.SetLayer(kicad_pcbnew.F_Fab)
+                # Write LCSC Params field to board footprint (wrapped in try/except)
+                if params and fp:
+                    try:
+                        fp.SetField("LCSC Params", params)
 
-            self.partlist_data_model.set_lcsc(
-                reference, e.lcsc, getattr(e, "type", ""), stock_str, params
-            )
+                        param_field = None
+                        with suppress(Exception):
+                            param_field = fp.GetFieldByName("LCSC Params")
+
+                        if param_field is None:
+                            with suppress(Exception):
+                                for field in fp.GetFields():
+                                    if field.GetName() == "LCSC Params":
+                                        param_field = field
+                                        break
+
+                        if param_field is not None:
+                            param_field.SetVisible(False)
+                            param_field.SetLayer(kicad_pcbnew.F_Fab)
+                        else:
+                            with suppress(Exception):
+                                for item in fp.GraphicalItems():
+                                    if hasattr(item, "GetText") and item.GetText() == params:
+                                        item.SetVisible(False)
+                                        item.SetLayer(kicad_pcbnew.F_Fab)
+                    except Exception as ex:
+                        self.logger.error(f"SetField LCSC Params failed for {reference}: {ex}")
+
+                self.partlist_data_model.set_lcsc(
+                    reference, e.lcsc, getattr(e, "type", ""), stock_str, params
+                )
+        except Exception as ex:
+            self.logger.error(f"assign_parts failed: {ex}")
+        finally:
+            # ALWAYS force a full UI refresh, even if an exception occurred above
+            self.logger.debug("assign_parts: calling populate_footprint_list()")
+            self.populate_footprint_list()
 
     def display_message(self, e):
         """Dispaly a message with the data from the event."""
@@ -819,10 +834,15 @@ class JLCPCBTools(wx.Dialog):
         for item in self.footprint_list.GetSelections():
             ref = self.partlist_data_model.get_reference(item)
             self.store.set_lcsc(ref, "")
+            self.store.set_stock(ref, "")
             board = self.pcbnew.GetBoard()
             fp = board.FindFootprintByReference(ref)
-            set_lcsc_value(fp, "")
+            try:
+                set_lcsc_value(fp, "")
+            except Exception as ex:
+                self.logger.error(f"set_lcsc_value('') failed for {ref}: {ex}")
             self.partlist_data_model.remove_lcsc_number(item)
+        self.populate_footprint_list()
 
     def select_alike(self, *_):
         """Select all parts that have the same value and footprint."""
@@ -893,11 +913,18 @@ class JLCPCBTools(wx.Dialog):
     def select_part(self, *_):
         """Select a part from the library and assign it to the selected footprint(s)."""
         selection = {}
+        lcsc_numbers = set()
         for item in self.footprint_list.GetSelections():
             ref = self.partlist_data_model.get_reference(item)
             value = self.partlist_data_model.get_value(item)
             selection[ref] = value
-        PartSelectorDialog(self, selection).ShowModal()
+            lcsc = self.partlist_data_model.get_lcsc(item)
+            if lcsc:
+                lcsc_numbers.add(lcsc)
+        # If all selected parts share exactly one LCSC number, use it as initial keyword;
+        # otherwise fall back to Value (handled by get_existing_selection in PartSelectorDialog)
+        initial_keyword = list(lcsc_numbers)[0] if len(lcsc_numbers) == 1 else None
+        PartSelectorDialog(self, selection, initial_keyword=initial_keyword).ShowModal()
 
     def count_order_number_placeholders(self):
         """Count the JLC order/serial number placeholders."""

@@ -82,15 +82,6 @@ class PartDetailsDialog(wx.Dialog):
             0,
         )
 
-        self.openpdf_button = wx.Button(
-            self,
-            wx.ID_ANY,
-            "打开数据手册",
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0,
-        )
-
         self.openpage_button = wx.Button(
             self,
             wx.ID_ANY,
@@ -100,18 +91,7 @@ class PartDetailsDialog(wx.Dialog):
             0,
         )
 
-
-        self.openpdf_button.Bind(wx.EVT_BUTTON, self.openpdf)
         self.openpage_button.Bind(wx.EVT_BUTTON, self.openpage)
-
-
-        self.openpdf_button.SetBitmap(
-            loadBitmapScaled(
-                "mdi-file-document-outline.png",
-                self.parent.scale_factor,
-            )
-        )
-        self.openpdf_button.SetBitmapMargins((2, 0))
 
         self.openpage_button.SetBitmap(
             loadBitmapScaled(
@@ -129,7 +109,6 @@ class PartDetailsDialog(wx.Dialog):
         right_side_layout.Add(self.image, 10, wx.ALL | wx.EXPAND, 5)
         right_side_layout.AddStretchSpacer(50)
 
-        right_side_layout.Add(self.openpdf_button, 5, wx.LEFT | wx.RIGHT | wx.EXPAND, 5)
         right_side_layout.Add(
             self.openpage_button, 5, wx.LEFT | wx.RIGHT | wx.EXPAND, 5
         )
@@ -169,10 +148,6 @@ class PartDetailsDialog(wx.Dialog):
                 wx.TheClipboard.Close()
 
 
-    def openpdf(self, *_):
-        """Open the linked datasheet PDF on button click."""
-        self.logger.info("opening %s", str(self.pdfurl))
-        webbrowser.open(str(self.pdfurl))
 
     def openpage(self, *_):
         """Open the linked LCSC page for the part on button click."""
