@@ -294,6 +294,37 @@ class SettingsDialog(wx.Dialog):
         szlcsc_online_search_sizer.Add(self.szlcsc_online_search_image, 10, wx.ALL | wx.EXPAND, 5)
         szlcsc_online_search_sizer.Add(self.szlcsc_online_search_setting, 100, wx.ALL | wx.EXPAND, 5)
 
+        ##### Search by Value keyword first #####
+
+        self.search_by_value_setting = wx.CheckBox(
+            self,
+            id=wx.ID_ANY,
+            label="优先搜索 Value 关键词",
+            pos=wx.DefaultPosition,
+            size=wx.DefaultSize,
+            style=0,
+            name="general_search_by_value",
+        )
+
+        self.search_by_value_setting.SetToolTip(
+            wx.ToolTip("勾选后，分配元件时优先使用 Value 关键词搜索，而非 LCSC 编号")
+        )
+
+        self.search_by_value_image = wx.StaticBitmap(
+            self,
+            wx.ID_ANY,
+            loadBitmapScaled("mdi-database-search-outline.png", self.parent.scale_factor, static=True),
+            wx.DefaultPosition,
+            wx.DefaultSize,
+            0,
+        )
+
+        self.search_by_value_setting.Bind(wx.EVT_CHECKBOX, self.update_settings)
+
+        search_by_value_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        search_by_value_sizer.Add(self.search_by_value_image, 10, wx.ALL | wx.EXPAND, 5)
+        search_by_value_sizer.Add(self.search_by_value_setting, 100, wx.ALL | wx.EXPAND, 5)
+
         # ---------------------------------------------------------------------
         # ---------------------- Main Layout Sizer ----------------------------
         # ---------------------------------------------------------------------
@@ -307,6 +338,7 @@ class SettingsDialog(wx.Dialog):
         layout.Add(lcsc_bom_cpl_sizer, 0, wx.ALL | wx.EXPAND, 5)
         layout.Add(order_number_sizer, 0, wx.ALL | wx.EXPAND, 5)
         layout.Add(szlcsc_online_search_sizer, 0, wx.ALL | wx.EXPAND, 5)
+        layout.Add(search_by_value_sizer, 0, wx.ALL | wx.EXPAND, 5)
         self.SetSizer(layout)
         self.Layout()
         self.Centre(wx.BOTH)
@@ -464,6 +496,27 @@ class SettingsDialog(wx.Dialog):
                 )
             )
 
+    def update_search_by_value(self, search_by_value):
+        """Update settings dialog according to the settings."""
+        if search_by_value:
+            self.search_by_value_setting.SetValue(search_by_value)
+            self.search_by_value_setting.SetLabel(
+                "优先搜索 Value 关键词"
+            )
+            self.search_by_value_image.SetBitmap(
+                loadBitmapScaled("mdi-database-search-outline.png", self.parent.scale_factor, static=True)
+            )
+        else:
+            self.search_by_value_setting.SetValue(search_by_value)
+            self.search_by_value_setting.SetLabel(
+                "优先搜索 LCSC 编号"
+            )
+            self.search_by_value_image.SetBitmap(
+                loadBitmapScaled(
+                    "mdi-database-search-outline.png", self.parent.scale_factor, static=True
+                )
+            )
+
     def load_settings(self):
         """Load settings and set checkboxes accordingly."""
         self.update_tented_vias(
@@ -489,6 +542,9 @@ class SettingsDialog(wx.Dialog):
         )
         self.update_szlcsc_online_search(
             self.parent.settings.get("general", {}).get("szlcsc_online_search", True)
+        )
+        self.update_search_by_value(
+            self.parent.settings.get("general", {}).get("search_by_value", False)
         )
 
     def update_settings(self, event):

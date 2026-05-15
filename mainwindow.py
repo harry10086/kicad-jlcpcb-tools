@@ -921,9 +921,14 @@ class JLCPCBTools(wx.Dialog):
             lcsc = self.partlist_data_model.get_lcsc(item)
             if lcsc:
                 lcsc_numbers.add(lcsc)
-        # If all selected parts share exactly one LCSC number, use it as initial keyword;
-        # otherwise fall back to Value (handled by get_existing_selection in PartSelectorDialog)
-        initial_keyword = list(lcsc_numbers)[0] if len(lcsc_numbers) == 1 else None
+        # Determine initial search keyword based on settings:
+        # When "search_by_value" is enabled, always use Value keyword;
+        # otherwise prefer existing LCSC number (default behavior).
+        search_by_value = self.settings.get("general", {}).get("search_by_value", False)
+        if search_by_value:
+            initial_keyword = None  # fall back to Value via get_existing_selection
+        else:
+            initial_keyword = list(lcsc_numbers)[0] if len(lcsc_numbers) == 1 else None
         PartSelectorDialog(self, selection, initial_keyword=initial_keyword).ShowModal()
 
     def count_order_number_placeholders(self):
