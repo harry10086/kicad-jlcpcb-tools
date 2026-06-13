@@ -182,7 +182,7 @@ class SettingsDialog(wx.Dialog):
 
         self.lcsc_priority_setting.SetToolTip(
             wx.ToolTip(
-                "原理图中的 LCSC 编号是否优先于数据库中的"
+                "原理图中的 LCSC 编号是否优先于数据库编号"
             )
         )
 

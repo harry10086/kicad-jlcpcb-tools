@@ -604,15 +604,16 @@ class JLCPCBTools(wx.Dialog):
                                         param_field = field
                                         break
 
+                        fab_layer = kicad_pcbnew.B_Fab if fp.GetLayer() == kicad_pcbnew.B_Cu else kicad_pcbnew.F_Fab
                         if param_field is not None:
                             param_field.SetVisible(False)
-                            param_field.SetLayer(kicad_pcbnew.F_Fab)
+                            param_field.SetLayer(fab_layer)
                         else:
                             with suppress(Exception):
                                 for item in fp.GraphicalItems():
                                     if hasattr(item, "GetText") and item.GetText() == params:
                                         item.SetVisible(False)
-                                        item.SetLayer(kicad_pcbnew.F_Fab)
+                                        item.SetLayer(fab_layer)
                     except Exception as ex:
                         self.logger.error(f"SetField LCSC Params failed for {reference}: {ex}")
 

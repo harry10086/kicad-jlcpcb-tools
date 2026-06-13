@@ -128,10 +128,19 @@ def set_lcsc_value(fp, lcsc: str):
 
     if lcsc_field:
         fp.SetField(lcsc_field.GetName(), lcsc)
+        field = fp.GetFieldByName(lcsc_field.GetName())
     else:
         fp.SetField("LCSC", lcsc)
         field = fp.GetFieldByName("LCSC")
+
+    if field:
         field.SetVisible(False)
+        try:
+            import pcbnew as kicad_pcbnew
+            fab_layer = kicad_pcbnew.B_Fab if fp.GetLayer() == kicad_pcbnew.B_Cu else kicad_pcbnew.F_Fab
+            field.SetLayer(fab_layer)
+        except Exception:
+            pass
 
 
 def get_valid_footprints(board):
