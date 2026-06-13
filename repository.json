@@ -8,8 +8,8 @@
     },
     "packages": {
         "url": "https://raw.githubusercontent.com/harry10086/kicad-jlcpcb-tools/main/packages.json",
-        "sha256": "5869aba12d19a7fd65619136f70914fe86ec0000f49f7d33232b85f43bc40842",
-        "update_timestamp": 1778811704,
-        "update_time_utc": "2026-05-15 02:21:44"
+        "sha256": "3bd6f4e79e736e53b70668f7cc4c4336f9128e5bc083d38a402c9ace0fbf6e21",
+        "update_timestamp": 1781365139,
+        "update_time_utc": "2026-06-13 15:38:59"
     }
 }
